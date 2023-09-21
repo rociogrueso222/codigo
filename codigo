@@ -1,0 +1,181 @@
+#include <stdio.h>
+#include <iostream>
+#include <cstring>
+#include <cfloat> // Para FLT_MAX
+using namespace std;
+struct CorredorNuevo
+{
+ char nombre[40];
+ float tiempo100m = 0.0;
+ CorredorNuevo* siguiente;
+};
+CorredorNuevo* cab, * aux, * sig, * aux2;
+int registrarNuevoCorredor()
+{
+ system("cls");
+ if (cab == NULL)
+ {
+ cab = (struct CorredorNuevo*)malloc(sizeof(struct CorredorNuevo));
+ cout << "<<<REGISTRO DE NUEVOS CORREDORES>>>" << endl;
+ cout << endl;
+ cout << "Ingresa el nombre: ";
+ cin >> cab->nombre;
+ cout << "Ingresa el tiempo en 100 metros (segundos): ";
+ cin >> cab->tiempo100m;
+ cab->siguiente = NULL;
+ }
+ else
+ {
+ aux = (struct CorredorNuevo*)malloc(sizeof(struct CorredorNuevo));
+ cout << "<<<REGISTRO DE NUEVOS CORREDORES>>>" << endl;
+ cout << endl;
+ cout << "Ingresa el nombre: ";
+ cin >> aux->nombre;
+ cout << "Ingresa el tiempo en 100 metros (segundos): ";
+ cin >> aux->tiempo100m;
+ aux->siguiente = NULL;
+ sig = cab;
+ while (sig->siguiente != NULL)
+ sig = sig->siguiente;
+ sig->siguiente = aux;
+ sig = aux = NULL;
+ free(aux);
+ free(sig);
+ }
+ return 0;
+}
+void ordenarTiemposAscendente()
+{
+ if (cab == NULL || cab->siguiente == NULL)
+ {
+ return;
+ }
+ bool huboIntercambio = true;
+ while (huboIntercambio)
+ {
+ huboIntercambio = false;
+ aux = cab;
+ while (aux->siguiente != NULL)
+ {
+ if (aux->tiempo100m > aux->siguiente->tiempo100m)
+ {
+ float tempTiempo = aux->tiempo100m;
+ aux->tiempo100m = aux->siguiente->tiempo100m;
+ aux->siguiente->tiempo100m = tempTiempo;
+ char tempNombre[40];
+ strcpy_s(tempNombre, sizeof(tempNombre), aux->nombre);
+ strcpy_s(aux->nombre, sizeof(aux->nombre), aux->siguiente->nombre);
+ strcpy_s(aux->siguiente->nombre, sizeof(aux->siguiente->nombre), tempNombre);
+ huboIntercambio = true;
+ }
+ aux = aux->siguiente;
+ }
+ }
+}
+int mostrarNuevosCorredores()
+{
+ system("cls");
+ int contador = 1;
+ cout << "<<<NUEVOS CORREDORES>>>" << endl;
+ cout << endl;
+ cout << endl;
+ cout << endl;
+ for (aux = cab; aux != NULL; aux = aux->siguiente)
+ {
+ cout << "Corredor #" << contador << endl;
+ cout << "Nombre: " << aux->nombre << endl;
+ cout << "Tiempo en 100 metros (segundos): " << aux->tiempo100m << endl;
+ cout << endl;
+ cout << endl;
+ contador++;
+ }
+ return 0;
+}
+float encontrarMejorTiempo()
+{
+ float mejorTiempo = FLT_MAX;
+ for (aux = cab; aux != NULL; aux = aux->siguiente)
+ {
+ if (aux->tiempo100m < mejorTiempo)
+ {
+ mejorTiempo = aux->tiempo100m;
+ }
+ }
+ return mejorTiempo;
+}
+void mostrarCorredoresOrdenadosPorTiempo()
+{
+ ordenarTiemposAscendente();
+ cout << "Nuevos corredores ordenados de menor a mayor tiempo:" << endl;
+ mostrarNuevosCorredores();
+ system("pause");
+ system("cls");
+}
+void calcularPromedioYMostrar()
+{
+ system("cls");
+ float sumaTiempos = 0.0;
+ int contador = 0;
+ for (aux = cab; aux != NULL; aux = aux->siguiente)
+ {
+ sumaTiempos += aux->tiempo100m;
+ contador++;
+ }
+ if (contador > 0)
+ {
+ float promedio = sumaTiempos / contador;
+ cout << "El promedio de tiempos en 100 metros es: " << promedio << " segundos" << endl;
+ }
+ else
+ {
+ cout << "No hay nuevos corredores registrados para calcular el promedio." << endl;
+ }
+}
+int main()
+{
+ int opcion = 0;
+ do
+ {
+ cout << endl;
+ cout << "<<<MENU>>>" << endl;
+ cout << endl;
+ cout << "1. REGISTRAR NUEVO CORREDOR" << endl;
+ cout << "2. MOSTRAR NUEVOS CORREDORES" << endl;
+ cout << "3. CALCULAR Y MOSTRAR PROMEDIO DE TIEMPOS" << endl;
+ cout << "4. MOSTRAR CORREDORES ORDENADOS POR TIEMPO" << endl;
+ cout << "5. MOSTRAR MEJOR TIEMPO" << endl;
+ cout << "6. SALIR" << endl;
+ cin >> opcion;
+ switch (opcion)
+ {
+ case 1:
+ registrarNuevoCorredor();
+ system("cls");
+ break;
+ case 2:
+ mostrarNuevosCorredores();
+ system("pause");
+ system("cls");
+ break;
+ case 3:
+ calcularPromedioYMostrar();
+ system("pause");
+ break;
+ case 4:
+ mostrarCorredoresOrdenadosPorTiempo();
+ break;
+ case 5:
+ cout << "Mejor tiempo en 100 metros: " << encontrarMejorTiempo() << " segundos" << 
+endl;
+ system("pause");
+ system("cls");
+ break;
+ case 6:
+ cout << "¡Adiós!" << endl;
+ break;
+ default:
+ break;
+ }
+ } while (opcion != 6);
+ return 0;
+}
